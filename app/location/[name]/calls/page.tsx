@@ -8,7 +8,6 @@ import { fetchTranscriptionData } from "@/utils/api";
 
 interface CallLog {
   id: string;
-  name: string;
   project_name: string;
   from_number: string;
   to_alias: string;
@@ -17,24 +16,38 @@ interface CallLog {
   start_time_datetime: string;
 }
 
-export function LocationCallsPage({ params }: { params: { id: string, name: string } }) {
+interface LocationCallsPageProps {
+  params: {
+    id: string;
+  };
+}
+
+interface Transcription {
+  text: string;
+  insights?: {
+    insights: string;
+  };
+}
+
+
+const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [audioFiles, setAudioFiles] = useState<Record<string, string>>({});
-  const [transcriptionData, setTranscriptionData] = useState<Record<string, any>>({});
+  const [transcriptionData, setTranscriptionData] = useState<Record<string, Transcription>>({});
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    
     const fetchCallLogs = async () => {
       try {
         const response = await fetch("/api/call-log");
         const data = await response.json();
         setCallLogs(Array.isArray(data?.data?.calls) ? data.data.calls : []);
+        console.log("call logs: ", data);
       } catch (error) {
         console.error("Error fetching call logs:", error);
       }
     };
-    
+
     const fetchAudioFiles = async () => {
       try {
         const response = await fetch("/api/audio");
@@ -42,7 +55,7 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
 
         if (Array.isArray(data?.audioFiles)) {
           const audioMap: Record<string, string> = {};
-          data.audioFiles.forEach((filePath : string) => {
+          data.audioFiles.forEach((filePath: string) => {
             const match = filePath.match(/(call-vn-1-\w+-\d+)\.mp3$/);
             if (match && match[1]) {
               const callId = match[1];
@@ -50,7 +63,6 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
             }
           });
 
-          console.log("Extracted Audio Map:", audioMap);
           setAudioFiles(audioMap);
         } else {
           console.error("Invalid audio file response format:", data);
@@ -63,8 +75,6 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
     fetchCallLogs();
     fetchAudioFiles();
   }, []);
-
-  
 
   const toggleRow = async (callId: string) => {
     setExpandedRows((prev) => {
@@ -84,7 +94,6 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
   };
 
   return (
-    
     <div className="min-h-screen bg-[#FAFAFA]">
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -92,7 +101,7 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
             <ChevronLeft className="h-4 w-4" />
             Back to Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Location {params.name} Calls</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Location {params.id} Calls</h1>
           <p className="text-muted-foreground">View and analyze call recordings</p>
         </div>
 
@@ -173,6 +182,6 @@ export function LocationCallsPage({ params }: { params: { id: string, name: stri
       </main>
     </div>
   );
-}
+};
 
 export default LocationCallsPage;

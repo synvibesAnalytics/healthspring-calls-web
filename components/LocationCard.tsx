@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 
 
 interface LocationCardProps {
-  id: string
+  // id: string
   name: string
   address: string
   phone: string
@@ -16,7 +16,7 @@ interface LocationCardProps {
   onSelect: () => void
 }
 
-export function LocationCard({ id, name, address, phone, isSelected, onSelect }: LocationCardProps) {
+export function LocationCard({ name, address, phone, isSelected, onSelect }: LocationCardProps) {
   return (
     <Card
       className={`transition-all hover:shadow-lg hover:border-primary/20 hover:bg-primary/5 cursor-pointer ${

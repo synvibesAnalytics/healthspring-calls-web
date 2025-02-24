@@ -103,6 +103,12 @@ export async function GET() {
                         const binFilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.bin`);
                         fs.writeFileSync(binFilePath, buffer);
 
+                        // Check if the .bin file exists
+                        if (!fs.existsSync(binFilePath)) {
+                            console.error(`File not found: ${binFilePath}`);
+                            return { success: false, callId, error: "File not found" };
+                        }
+
                         // Convert the .bin file to .mp3 using ffmpeg
                         const mp3FilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.mp3`);
 
@@ -129,13 +135,14 @@ export async function GET() {
                         return { success: false, callId };
                     }
                 });
-
-            return NextResponse.json({
-                message: 'Download attempt complete',
-                data: data,
-                // Optionally you can return the download results here.
-                // results: await Promise.all(downloadPromises),
-            });
+            console.log("Download attempts complete:", downloadPromises);
+            return NextResponse.json(data)
+            // return NextResponse.json({
+            //     message: 'Download attempt complete',
+            //     data: data,
+            //     // Optionally you can return the download results here.
+            //     // results: await Promise.all(downloadPromises),
+            // });
         } else {
             return NextResponse.json({
                 message: 'No recorded calls available',

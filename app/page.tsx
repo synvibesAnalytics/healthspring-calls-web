@@ -101,7 +101,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {dashboardLocations.map((location) => (
             <LocationCard
-              id={location.id}
+              key = {location.id}
               name={location.name}
               phone={location.phone}
               address={location.address}
