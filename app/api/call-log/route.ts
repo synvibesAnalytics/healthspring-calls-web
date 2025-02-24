@@ -135,7 +135,6 @@ export async function GET() {
                         return { success: false, callId };
                     }
                 });
-            console.log("Download attempts complete:", downloadPromises);
             return NextResponse.json(data)
             // return NextResponse.json({
             //     message: 'Download attempt complete',

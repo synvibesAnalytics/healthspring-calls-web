@@ -59,7 +59,7 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
             const match = filePath.match(/(call-vn-1-\w+-\d+)\.mp3$/);
             if (match && match[1]) {
               const callId = match[1];
-              audioMap[callId] = `http://localhost:3000${filePath}`;
+              audioMap[callId] = `https://springcalls.vercel.app${filePath}`;
             }
           });
 
