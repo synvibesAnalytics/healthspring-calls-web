@@ -8,6 +8,7 @@ import { fetchTranscriptionData } from "@/utils/api";
 
 interface CallLog {
   id: string;
+  name: string;
   project_name: string;
   from_number: string;
   to_alias: string;
@@ -16,7 +17,7 @@ interface CallLog {
   start_time_datetime: string;
 }
 
-export function LocationCallsPage({ params }: { params: { id: string } }) {
+export function LocationCallsPage({ params }: { params: { id: string, name: string } }) {
   const [callLogs, setCallLogs] = useState<CallLog[]>([]);
   const [audioFiles, setAudioFiles] = useState<Record<string, string>>({});
   const [transcriptionData, setTranscriptionData] = useState<Record<string, any>>({});
@@ -41,7 +42,7 @@ export function LocationCallsPage({ params }: { params: { id: string } }) {
 
         if (Array.isArray(data?.audioFiles)) {
           const audioMap: Record<string, string> = {};
-          data.audioFiles.forEach((filePath) => {
+          data.audioFiles.forEach((filePath : string) => {
             const match = filePath.match(/(call-vn-1-\w+-\d+)\.mp3$/);
             if (match && match[1]) {
               const callId = match[1];

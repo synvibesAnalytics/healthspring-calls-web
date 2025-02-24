@@ -7,16 +7,16 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 
 
 interface LocationCardProps {
+  id: string
   name: string
   address: string
   phone: string
-  id: string
-  callsAnswered: number
+  // callsAnswered: number
   isSelected: boolean
   onSelect: () => void
 }
 
-export function LocationCard({ name, address, phone, id, callsAnswered, isSelected, onSelect }: LocationCardProps) {
+export function LocationCard({ id, name, address, phone, isSelected, onSelect }: LocationCardProps) {
   return (
     <Card
       className={`transition-all hover:shadow-lg hover:border-primary/20 hover:bg-primary/5 cursor-pointer ${
@@ -42,9 +42,9 @@ export function LocationCard({ name, address, phone, id, callsAnswered, isSelect
             <span>{phone}</span>
           </div>
         </div>
-        <div className="mt-2 text-sm font-medium">
+        {/* <div className="mt-2 text-sm font-medium">
           Calls Answered: <span className="text-primary">{callsAnswered}</span>
-        </div>
+        </div> */}
         {/* <div className="mt-2 text-sm text-red-600 bg-red-100 p-2 rounded-md">
               This location requires attention due to low engagement ratings
         </div> */}

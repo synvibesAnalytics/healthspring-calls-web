@@ -46,8 +46,14 @@ function generateJWT(): string {
 }
 
 interface Call {
-    id: string; 
-    recorded: number; 
+    id: string;
+    recorded: number;
+}
+
+interface CallLogResponse {
+    data?: {
+        calls: Call[];
+    };
 }
 
 export async function GET() {
@@ -66,80 +72,77 @@ export async function GET() {
             },
         });
 
-        const data = await response.json();
+        // Assert the response type as CallLogResponse
+        const data = await response.json() as CallLogResponse;
 
-            const calls = Array.isArray(data?.data?.calls) ? data.data.calls : [];
-    
-            if (calls.length > 0) {
-                // Download the recordings for each call where `recorded` is 1
-                const downloadPromises = calls
-                    .filter((call: Call) => call.recorded === 1)
-                    .map(async (call: Call) => {
-                        const callId = call.id;
-    
-                        // Request to download the recording
-                        const recordingResponse = await fetch(`${BASE_URL}/v1/call/recording/${callId}`, {
-                            headers: {
-                                'X-STRINGEE-AUTH': token,
-                            },
+
+        const calls = Array.isArray(data?.data?.calls) ? data.data.calls : [];
+
+        if (calls.length > 0) {
+            // Download the recordings for each call where `recorded` is 1
+            const downloadPromises = calls
+                .filter((call: Call) => call.recorded === 1)
+                .map(async (call: Call) => {
+                    const callId = call.id;
+
+                    // Request to download the recording
+                    const recordingResponse = await fetch(`${BASE_URL}/v1/call/recording/${callId}`, {
+                        headers: {
+                            'X-STRINGEE-AUTH': token,
+                        },
+                    });
+
+                    // Check if the recording exists
+                    if (recordingResponse.ok) {
+                        const fileBuffer = await recordingResponse.arrayBuffer();
+
+                        // Convert ArrayBuffer to Buffer
+                        const buffer = Buffer.from(fileBuffer);
+
+                        // Save the file in the 'audio_files' directory
+                        const binFilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.bin`);
+                        fs.writeFileSync(binFilePath, buffer);
+
+                        // Convert the .bin file to .mp3 using ffmpeg
+                        const mp3FilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.mp3`);
+
+                        await new Promise<void>((resolve, reject) => {
+                            ffmpeg(binFilePath)
+                                .audioFilter('afftdn') // Noise reduction filter
+                                .audioCodec('libmp3lame') // Ensure MP3 encoding
+                                .output(mp3FilePath)
+                                .on('end', () => {
+                                    resolve();
+                                })
+                                .on('error', (err) => {
+                                    console.error(`Error during conversion: ${err.message}`);
+                                    reject(err);
+                                })
+                                .run();
                         });
-    
-                        // Check if the recording exists
-                        if (recordingResponse.ok) {
-                            const fileBuffer = await recordingResponse.arrayBuffer();
-    
-                            // Convert ArrayBuffer to Buffer
-                            const buffer = Buffer.from(fileBuffer);
-    
-                            // Save the file in the 'audio_files' directory
-                            const binFilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.bin`);
-                            fs.writeFileSync(binFilePath, buffer);
 
-                                                    // Convert the .bin file to .mp3 using ffmpeg
-                            const mp3FilePath = path.join(process.cwd(), 'public', 'audio_files', `${callId}.mp3`);
+                        // Optionally delete the .bin file after conversion
+                        fs.unlinkSync(binFilePath);
 
-                            await new Promise<void>((resolve, reject) => {
-                                ffmpeg(binFilePath)
-                                    .audioFilter('afftdn') // Noise reduction filter
-                                    .audioCodec('libmp3lame') // Ensure MP3 encoding
-                                    .output(mp3FilePath)
-                                    .on('end', () => {
-                                        resolve();
-                                    })
-                                    .on('error', (err) => {
-                                        console.error(`Error during conversion: ${err.message}`);
-                                        reject(err);
-                                    })
-                                    .run();
-                            });
-
-                            // Optionally delete the .bin file after conversion
-                            fs.unlinkSync(binFilePath);
-    
-                            return { success: true, callId };
-                        } else {
-                            return { success: false, callId };
-                        }
-                    });
-    
-                const downloadResults = await Promise.all(downloadPromises);
-
-                return NextResponse.json(data) //this works
-    
-                {/*
-                    doesnt return details when sent like this
-                    return NextResponse.json({
-                        data: data,
-                        message: 'Download attempt complete',
-                        results: downloadResults,
-                    });
-                */}
-            } else {
-                return NextResponse.json({
-                    message: 'No recorded calls available',
+                        return { success: true, callId };
+                    } else {
+                        return { success: false, callId };
+                    }
                 });
-            }
+
+            return NextResponse.json({
+                message: 'Download attempt complete',
+                data: data,
+                // Optionally you can return the download results here.
+                // results: await Promise.all(downloadPromises),
+            });
+        } else {
+            return NextResponse.json({
+                message: 'No recorded calls available',
+            });
+        }
     } catch (error) {
+        console.error("Error:", error);
         return NextResponse.json({ error: "Failed to fetch logs" }, { status: 500 });
     }
 }

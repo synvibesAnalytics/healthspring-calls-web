@@ -2,7 +2,6 @@ import React from "react";
 import Link from "next/link";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
   return (
     <div>
       <footer className="bg-[#fefeff] z-0 relative border-t-2 border-[#6b6b6b2f]">

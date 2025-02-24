@@ -101,11 +101,11 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {dashboardLocations.map((location) => (
             <LocationCard
-              key={location.id}
               id={location.id}
               name={location.name}
               phone={location.phone}
-              callsAnswered={location.callsAnswered}
+              address={location.address}
+              // callsAnswered={location.callsAnswered}
               isSelected={selectedLocation === location.id}
               onSelect={() => setSelectedLocation(location.id)}
             />
@@ -135,12 +135,12 @@ export default function Home() {
                     {dashboardLocations.reduce((sum, loc) => sum + loc.callsAnswered, 0)}
                   </p> */}
                 </div>
-                <div>
+                {/* <div>
                   <h3 className="text-lg font-semibold">Busiest Location</h3>
                   <p className="text-xl font-semibold">
                     {dashboardLocations.reduce((max, loc) => (loc.callsAnswered > max.callsAnswered ? loc : max)).name}
                   </p>
-                </div>
+                </div> */}
                 <div>
                   <h3 className="text-lg font-semibold">Average Calls per Location</h3>
                   <p className="text-3xl font-bold text-primary">1</p>

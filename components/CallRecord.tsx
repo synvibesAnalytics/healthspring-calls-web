@@ -74,9 +74,8 @@ export function CallRecord({ rating, duration, transcription, insights, date, ti
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={`h-4 w-4 ${
-                i < Math.round(rating / 2) ? "fill-primary text-primary" : "fill-muted text-muted-foreground"
-              }`}
+              className={`h-4 w-4 ${i < Math.round(rating / 2) ? "fill-primary text-primary" : "fill-muted text-muted-foreground"
+                }`}
             />
           ))}
           <span className="ml-2 text-sm">({rating}/10)</span>
@@ -85,9 +84,25 @@ export function CallRecord({ rating, duration, transcription, insights, date, ti
       <TableCell className="border-r">{duration}</TableCell>
       <TableCell className="border-r">
         <audio ref={audioRef} controls src={audioUrl || undefined} className="w-full h-12" onPlay={playAudio}>
-            Your browser does not support the audio element.
+          Your browser does not support the audio element.
         </audio>
       </TableCell>
+      <TableCell className="border-r">
+        {audioFiles.length > 0 ? (
+          <ul className="list-disc list-inside">
+            {audioFiles.map((audio, index) => (
+              <li key={index}>
+                <a href={audio.url} target="_blank" rel="noopener noreferrer">
+                  {audio.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <span>No audio files available</span>
+        )}
+      </TableCell>
+
       <TableCell className="border-r">
         <Collapsible open={isTranscriptOpen} onOpenChange={toggleTranscript}>
           <CollapsibleTrigger asChild>
