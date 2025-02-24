@@ -52,17 +52,27 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
       try {
         const response = await fetch("/api/audio");
         const data = await response.json();
-
+        console.log("audiodata", data);
+    
         if (Array.isArray(data?.audioFiles)) {
           const audioMap: Record<string, string> = {};
+    
           data.audioFiles.forEach((filePath: string) => {
+            // Extract call ID from filename
             const match = filePath.match(/(call-vn-1-\w+-\d+)\.mp3$/);
             if (match && match[1]) {
               const callId = match[1];
-              audioMap[callId] = `https://springcalls.vercel.app${filePath}`;
+    
+              // Use absolute URL in production, relative in development
+              const baseUrl =
+                process.env.NODE_ENV === "production"
+                  ? "https://springcalls.vercel.app"
+                  : "";
+    
+              audioMap[callId] = `${baseUrl}${filePath}`;
             }
           });
-
+    
           setAudioFiles(audioMap);
         } else {
           console.error("Invalid audio file response format:", data);
@@ -71,6 +81,7 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
         console.error("Error fetching audio files:", error);
       }
     };
+    
 
     fetchCallLogs();
     fetchAudioFiles();
@@ -86,12 +97,25 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
       }
       return newExpanded;
     });
-
+  
     if (!transcriptionData[callId] && audioFiles[callId]) {
-      const data = await fetchTranscriptionData(audioFiles[callId]);
+      const audioUrl = audioFiles[callId];
+  
+      // Ensure absolute URL in production
+      const baseUrl =
+        process.env.NODE_ENV === "production"
+          ? "https://springcalls.vercel.app"
+          : "";
+  
+      const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${baseUrl}${audioUrl}`;
+  
+      console.log("Fetching transcription for:", fullAudioUrl);
+  
+      const data = await fetchTranscriptionData(fullAudioUrl);
       setTranscriptionData((prev) => ({ ...prev, [callId]: data }));
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
