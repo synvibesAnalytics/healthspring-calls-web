@@ -107,12 +107,12 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
       //   process.env.NODE_ENV === "production"
       //     ? "https://springcalls.vercel.app"
       //     : "";
-      const baseUrl = process.env.FRONTEND_BASE;
-      const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${baseUrl}${audioUrl}`;
+      // const baseUrl = process.env.FRONTEND_BASE;
+      // const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${baseUrl}${audioUrl}`;
   
-      console.log("Fetching transcription for:", fullAudioUrl);
+      console.log("Fetching transcription for:", audioUrl);
   
-      const data = await fetchTranscriptionData(fullAudioUrl);
+      const data = await fetchTranscriptionData(audioUrl);
       setTranscriptionData((prev) => ({ ...prev, [callId]: data }));
     }
   };
