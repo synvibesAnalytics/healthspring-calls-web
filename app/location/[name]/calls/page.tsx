@@ -64,12 +64,13 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
               const callId = match[1];
     
               // Use absolute URL in production, relative in development
-              const baseUrl =
-                process.env.NODE_ENV === "production"
-                  ? "https://springcalls.vercel.app"
-                  : "";
+              // const baseUrl =
+              //   process.env.NODE_ENV === "production"
+              //     ? "https://springcalls.vercel.app"
+              //     : "";
+              const baseUrl = process.env.FRONTEND_BASE;
     
-              audioMap[callId] = `${baseUrl}${filePath}`;
+              audioMap[callId] = `${baseUrl}/audio_files/${filePath}`;
             }
           });
     
@@ -102,11 +103,11 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
       const audioUrl = audioFiles[callId];
   
       // Ensure absolute URL in production
-      const baseUrl =
-        process.env.NODE_ENV === "production"
-          ? "https://springcalls.vercel.app"
-          : "";
-  
+      // const baseUrl =
+      //   process.env.NODE_ENV === "production"
+      //     ? "https://springcalls.vercel.app"
+      //     : "";
+      const baseUrl = process.env.FRONTEND_BASE;
       const fullAudioUrl = audioUrl.startsWith("http") ? audioUrl : `${baseUrl}${audioUrl}`;
   
       console.log("Fetching transcription for:", fullAudioUrl);

@@ -22,7 +22,7 @@ export async function GET() {
         }
 
         // Convert filenames to public URLs
-        const audioUrls = audioFiles.map((file) => `https://springcalls.vercel.app/audio_files/${file}`);
+        const audioUrls = audioFiles.map((file) => `${file}`);
         return NextResponse.json({ audioFiles: audioUrls });
     } catch (error) {
         console.error("Error reading audio files:", error);
