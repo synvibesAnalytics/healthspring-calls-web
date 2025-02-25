@@ -68,9 +68,9 @@ const LocationCallsPage: React.FC<LocationCallsPageProps> = ({ params }) => {
               //   process.env.NODE_ENV === "production"
               //     ? "https://springcalls.vercel.app"
               //     : "";
-              const baseUrl = process.env.FRONTEND_BASE;
+              // const baseUrl = process.env.FRONTEND_BASE; //doesnt work for production somehow
     
-              audioMap[callId] = `${baseUrl}/audio_files/${filePath}`;
+              audioMap[callId] = `https://springcalls.vercel.app/audio_files/${filePath}`;
             }
           });
     
