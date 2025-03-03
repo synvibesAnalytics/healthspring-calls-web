@@ -1,33 +1,36 @@
-// components/ui/badge.tsx
-import React from 'react';
-import { AlertTriangle } from 'lucide-react'; // Import the icon from lucide-react
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-// Define types for the component's props
-export interface BadgeProps {
-  variant: 'destructive' | 'default' | 'info' | 'success'; // You can add more variants as needed
-  className?: string;
-  children: React.ReactNode;
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
 }
 
-const Badge: React.FC<BadgeProps> = ({ variant, className, children }) => {
-  // Determine the appropriate classes based on the variant
-  let badgeClasses = 'flex items-center gap-1 px-3 py-1 rounded-lg text-sm';
-  if (variant === 'destructive') {
-    badgeClasses += ' bg-red-600 text-white'; // Red background for destructive
-  } else if (variant === 'default') {
-    badgeClasses += ' bg-gray-200 text-black'; // Default grey background
-  } else if (variant === 'info') {
-    badgeClasses += ' bg-blue-500 text-white'; // Blue background for info
-  } else if (variant === 'success') {
-    badgeClasses += ' bg-green-600 text-white'; // Green background for success
-  }
-
-  return (
-    <div className={`${badgeClasses} ${className}`}>
-      <AlertTriangle className="h-3 w-3" /> {/* This is the icon */}
-      {children}
-    </div>
-  );
-};
-
-export { Badge }; // Export the component
+export { Badge, badgeVariants }
